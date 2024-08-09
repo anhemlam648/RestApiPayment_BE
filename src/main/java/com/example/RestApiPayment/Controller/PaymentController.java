@@ -26,6 +26,7 @@ public class PaymentController {
     public ResponseEntity<Payment> executePayment( @RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String PayerID) {
         try {
             Payment payment = paymentService.executePayment(paymentId, PayerID );
+            System.out.println("Success" + payment);
             return ResponseEntity.ok(payment);
         } catch (Exception ex) {
             System.out.println("Error executing PayPal payment: " + ex.getMessage());
