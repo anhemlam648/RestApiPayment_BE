@@ -24,7 +24,9 @@ public class PaymentController {
     }
 
     @GetMapping("/execute")
-    public Payment executePayment(@RequestBody ExecutePayment executePayment) {
-        return paymentService.executePayment(executePayment);
+    public ResponseEntity<Payment> executePayment(@RequestBody ExecutePayment executePayment) {
+        Payment payment = paymentService.executePayment(executePayment);
+        return ResponseEntity.ok(payment);
+//        return paymentService.executePayment(executePayment);
     }
 }
