@@ -18,7 +18,7 @@ public class PaymentService {
     @Autowired
     private APIContext apiContext;
 
-    public Payment create(@RequestBody PaymentRequest paymentRequest){
+    public String createPayment(@RequestBody PaymentRequest paymentRequest){
         try{
             Payer payer = new Payer();
             payer.setPaymentMethod(paymentRequest.getMethod());
@@ -39,19 +39,30 @@ public class PaymentService {
             payment.setPayer(payer);
             payment.setTransactions(transactions);
 
-            payment.setRedirectUrls(paymentRequest.getRedirectUrls());
+            RedirectUrls redirectUrls = paymentRequest.getRedirectUrls();
+            if (redirectUrls != null) {
+                payment.setRedirectUrls(redirectUrls);
+            } else {
+                throw new RuntimeException("Redirect URLs must be provided.");
+            }
 
             Payment createdPayment = payment.create(apiContext);
 
-            return createdPayment;
+            for (Links link : createdPayment.getLinks()) {
+                if (link.getRel().equals("approval_url")) {
+                    return link.getHref();
+                }
+            }
+            throw new RuntimeException("Approval URL not found in PayPal response.");
 
+//            return createdPayment;
         }catch (Exception ex){
             System.out.println("Error creating PayPal payment:" + ex.getMessage());
             throw new RuntimeException("Payment creation failed",ex);
         }
     }
 
-    public Payment execute(@RequestBody ExecutePayment executePayment){
+    public Payment executePayment(@RequestBody ExecutePayment executePayment){
         try {
             Payment payment = new Payment();
             payment.setId(executePayment.getPaymentId());
