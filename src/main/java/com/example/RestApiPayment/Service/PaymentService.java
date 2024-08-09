@@ -1,13 +1,12 @@
 package com.example.RestApiPayment.Service;
 
+import com.example.RestApiPayment.Entity.ExecutePayment;
 import com.example.RestApiPayment.Entity.PaymentRequest;
-import com.paypal.api.payments.Amount;
-import com.paypal.api.payments.Payer;
-import com.paypal.api.payments.Payment;
-import com.paypal.api.payments.Transaction;
+import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ public class PaymentService {
     @Autowired
     private APIContext apiContext;
 
-    public Payment create(@RequestParam PaymentRequest paymentRequest){
+    public Payment create(@RequestBody PaymentRequest paymentRequest){
         try{
             Payer payer = new Payer();
             payer.setPaymentMethod(paymentRequest.getMethod());
@@ -49,6 +48,19 @@ public class PaymentService {
         }catch (Exception ex){
             System.out.println("Error creating PayPal payment:" + ex.getMessage());
             throw new RuntimeException("Payment creation failed",ex);
+        }
+    }
+
+    public Payment execute(@RequestBody ExecutePayment executePayment){
+        try {
+            Payment payment = new Payment();
+            payment.setId(executePayment.getPaymentId());
+            PaymentExecution paymentExecution = new PaymentExecution();
+            paymentExecution.setPayerId(executePayment.getPayerId());
+            return payment.execute(apiContext, paymentExecution);
+        }catch (Exception ex){
+            System.out.println("Error excuting PayPal payment:" + ex.getMessage());
+            throw new RuntimeException("Payment excution failed",ex);
         }
     }
 }

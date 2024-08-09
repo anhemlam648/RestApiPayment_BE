@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExecutePaymentRequest {
+public class ExecutePayment {
     public String paymentId;
     public String payerId;
 }
