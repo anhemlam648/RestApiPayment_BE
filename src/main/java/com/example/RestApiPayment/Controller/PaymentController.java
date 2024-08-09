@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/payment")
+@CrossOrigin(origins = "http://localhost:3030")
 public class PaymentController {
 
     @Autowired
@@ -20,7 +21,6 @@ public class PaymentController {
         String approvalUrl = paymentService.createPayment(paymentRequest);
         return ResponseEntity.ok(approvalUrl);
     }
-
 
     @GetMapping("/execute")
     public ResponseEntity<Payment> executePayment( @RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String PayerID) {
