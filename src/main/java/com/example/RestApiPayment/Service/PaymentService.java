@@ -1,13 +1,11 @@
 package com.example.RestApiPayment.Service;
 
-import com.example.RestApiPayment.Entity.ExecutePayment;
 import com.example.RestApiPayment.Entity.PaymentRequest;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
+import com.paypal.base.rest.PayPalRESTException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +16,8 @@ public class PaymentService {
     @Autowired
     private APIContext apiContext;
 
-    public String createPayment(@RequestBody PaymentRequest paymentRequest){
+    //CreatePayment
+    public String createPayment(PaymentRequest paymentRequest){
         try{
             Payer payer = new Payer();
             payer.setPaymentMethod(paymentRequest.getMethod());
@@ -50,28 +49,25 @@ public class PaymentService {
 
             for (Links link : createdPayment.getLinks()) {
                 if (link.getRel().equals("approval_url")) {
-                    return link.getHref();
+                    return  link.getHref();
                 }
             }
             throw new RuntimeException("Approval URL not found in PayPal response.");
 
 //            return createdPayment;
+
         }catch (Exception ex){
             System.out.println("Error creating PayPal payment:" + ex.getMessage());
             throw new RuntimeException("Payment creation failed",ex);
         }
     }
 
-    public Payment executePayment(@RequestBody ExecutePayment executePayment){
-        try {
+    //ExcutePayment
+        public Payment executePayment(String paymentId, String PayerId) throws PayPalRESTException {
             Payment payment = new Payment();
-            payment.setId(executePayment.getPaymentId());
-            PaymentExecution paymentExecution = new PaymentExecution();
-            paymentExecution.setPayerId(executePayment.getPayerId());
-            return payment.execute(apiContext, paymentExecution);
-        }catch (Exception ex){
-            System.out.println("Error excuting PayPal payment:" + ex.getMessage());
-            throw new RuntimeException("Payment excution failed",ex);
-        }
+            payment.setId(paymentId);
+            PaymentExecution paymentExecute = new PaymentExecution();
+            paymentExecute.setPayerId(PayerId);
+            return payment.execute(apiContext, paymentExecute);
     }
 }

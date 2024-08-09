@@ -1,11 +1,10 @@
 package com.example.RestApiPayment.Controller;
 
-import com.example.RestApiPayment.Entity.ExecutePayment;
 import com.example.RestApiPayment.Entity.PaymentRequest;
 import com.example.RestApiPayment.Service.PaymentService;
 import com.paypal.api.payments.Payment;
-import com.paypal.base.rest.APIContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,13 +19,17 @@ public class PaymentController {
     public ResponseEntity<String> createPayment(@RequestBody PaymentRequest paymentRequest) {
         String approvalUrl = paymentService.createPayment(paymentRequest);
         return ResponseEntity.ok(approvalUrl);
-//        return paymentService.createPayment(paymentRequest);
     }
 
+
     @GetMapping("/execute")
-    public ResponseEntity<Payment> executePayment(@RequestBody ExecutePayment executePayment) {
-        Payment payment = paymentService.executePayment(executePayment);
-        return ResponseEntity.ok(payment);
-//        return paymentService.executePayment(executePayment);
+    public ResponseEntity<Payment> executePayment( @RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String PayerID) {
+        try {
+            Payment payment = paymentService.executePayment(paymentId, PayerID );
+            return ResponseEntity.ok(payment);
+        } catch (Exception ex) {
+            System.out.println("Error executing PayPal payment: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

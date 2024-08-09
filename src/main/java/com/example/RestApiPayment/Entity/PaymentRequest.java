@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PaymentRequest {
-    public Double total;
-    public String currency;
-    public String method;
-    public String intent;
-    public String description;
+    private Double total;
+    private String currency;
+    private String method;
+    private String intent;
+    private String description;
     private RedirectUrls redirectUrls;
 }
